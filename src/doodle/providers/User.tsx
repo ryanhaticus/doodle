@@ -1,4 +1,4 @@
-import { onIdTokenChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
@@ -18,7 +18,7 @@ const UserProvider = ({ children }: IUserProviderProps) => {
   const [user, setUser] = useState<IUser>(null);
 
   // TODO: Find out why this isn't firing when a user authenticates.
-  const idTokenChanged = async (user: User) => {
+  const authStateChanged = async (user: User) => {
     if (!user) {
       setUser(null);
       setWaitingForFirebase(false);
@@ -34,11 +34,7 @@ const UserProvider = ({ children }: IUserProviderProps) => {
     setWaitingForFirebase(false);
   };
 
-  useEffect(() => {
-    const unsubscribe = onIdTokenChanged(auth, idTokenChanged);
-
-    return () => unsubscribe();
-  }, []);
+  useEffect(() => onAuthStateChanged(auth, authStateChanged), []);
 
   if (waitingForFirebase) {
     return (
