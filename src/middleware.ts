@@ -4,7 +4,8 @@ import type { NextRequest } from 'next/server';
 import DoodleConfig from '@/doodle/config';
 
 export const middleware = async (request: NextRequest) => {
-  const { secured, fallback } = DoodleConfig.middleware.authentication;
+  const { secured, redirects } = DoodleConfig.middleware.authentication;
+  const { fallback } = redirects;
 
   let isSecured = false;
 
@@ -19,9 +20,9 @@ export const middleware = async (request: NextRequest) => {
     return NextResponse.next();
   }
 
-  const SID = request.cookies.get('SID');
+  const DIT = request.cookies.get('DIT');
 
-  if (!SID) {
+  if (!DIT) {
     return NextResponse.redirect(new URL(fallback, request.url));
   }
 

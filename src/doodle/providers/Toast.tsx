@@ -15,12 +15,14 @@ const ToastProvider = ({ children }: IToastProviderProps) => {
   const [title, setTitle] = useState('Message');
   const [type, setType] = useState<ToastType>('info');
   const [cancelText, setCancelText] = useState('Continue');
+  const [closeOnRedirect, setCloseOnRedirect] = useState(false);
 
   const display = (title: string, message: string, options?: ToastOptions) => {
     setTitle(title);
     setMessage(message);
     setType(options?.type ?? 'info');
     setCancelText(options?.cancelText ?? 'Continue');
+    setCloseOnRedirect(options?.closeOnRedirect ?? false);
     setOpen(true);
   };
 
@@ -33,6 +35,7 @@ const ToastProvider = ({ children }: IToastProviderProps) => {
         title={title}
         type={type}
         cancelText={cancelText}
+        closeOnRedirect={closeOnRedirect}
       />
       {children}
     </ToastContext.Provider>

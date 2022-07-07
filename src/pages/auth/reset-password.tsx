@@ -1,57 +1,39 @@
 import Link from 'next/link';
 import { FormEvent, useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 import Logo from '@/doodle/components/Logo';
 import PageSeo from '@/doodle/components/PageSeo';
 import { useFirebase } from '@/doodle/contexts/Firebase';
 import { useToast } from '@/doodle/contexts/Toast';
 
-const SignUp = () => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
   const { auth } = useFirebase();
   const { display } = useToast();
 
-  const onSignUp = async (e: FormEvent<HTMLFormElement>) => {
+  const onPasswordReset = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      if (password !== confirmPassword) {
-        throw {
-          code: 'auth/password-mismatch',
-        };
-      }
+      await sendPasswordResetEmail(auth, email);
 
-      await createUserWithEmailAndPassword(auth, email, password);
-
-      display('Signed up', 'Please wait while we redirect you.', {
-        type: 'success',
-        cancelText: 'Continue',
-        closeOnRedirect: true,
-      });
+      display(
+        'Password reset sent',
+        'Please check your email address for a link to reset your password.',
+        {
+          type: 'success',
+          cancelText: 'Continue',
+          closeOnRedirect: true,
+        },
+      );
     } catch (e) {
       switch (e.code) {
-        case 'auth/password-mismatch':
-          display('Password mismatch', 'Please ensure your passwords match.', {
-            type: 'error',
-            cancelText: 'Try again',
-          });
-          break;
-
-        case 'auth/email-already-in-use':
-          display('Email already in use', 'You may already have an account.', {
-            type: 'error',
-            cancelText: 'Try again',
-          });
-          break;
-
-        case 'auth/weak-password':
+        case 'auth/user-not-found':
           display(
-            'Weak password',
-            'Please ensure your password is at least 6 characters long.',
+            'User not found',
+            'Please ensure your email address is correct.',
             {
               type: 'error',
               cancelText: 'Try again',
@@ -71,7 +53,7 @@ const SignUp = () => {
 
   return (
     <>
-      <PageSeo title='Sign up' />
+      <PageSeo title='Reset password' />
       <div className='min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8'>
         <div className='max-w-md w-full space-y-8'>
           <div>
@@ -79,19 +61,19 @@ const SignUp = () => {
               <Logo />
             </div>
             <h2 className='mt-6 text-center text-3xl font-extrabold text-gray-900'>
-              Sign up for an account
+              Reset your password
             </h2>
             <p className='mt-2 text-center text-sm text-gray-600'>
               or{' '}
               <Link href='/auth/sign-in'>
                 <a className='font-medium text-indigo-600 hover:text-indigo-500'>
-                  sign in to your account
+                  sign in if you remember
                 </a>
               </Link>
             </p>
           </div>
           <form
-            onSubmit={onSignUp}
+            onSubmit={onPasswordReset}
             className='mt-8 space-y-6'
             action='#'
             method='POST'
@@ -109,38 +91,8 @@ const SignUp = () => {
                   type='email'
                   autoComplete='email'
                   required
-                  className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
+                  className='appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
                   placeholder='Email address'
-                />
-              </div>
-
-              <div>
-                <label htmlFor='password' className='sr-only'>
-                  Password
-                </label>
-                <input
-                  onChange={(e) => setPassword(e.target.value)}
-                  id='password'
-                  name='password'
-                  type='password'
-                  autoComplete='current-password'
-                  required
-                  className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
-                  placeholder='Password'
-                />
-              </div>
-              <div>
-                <label htmlFor='confirm-password' className='sr-only'>
-                  Confirm Password
-                </label>
-                <input
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  id='confirm-password'
-                  name='confirm-password'
-                  type='password'
-                  required
-                  className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
-                  placeholder='Confirm Password'
                 />
               </div>
             </div>
@@ -167,7 +119,7 @@ const SignUp = () => {
                     ></path>
                   </svg>
                 </span>
-                Sign up
+                Send password reset
               </button>
             </div>
           </form>
@@ -177,4 +129,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default ForgotPassword;

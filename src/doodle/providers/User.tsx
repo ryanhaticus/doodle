@@ -1,5 +1,5 @@
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { getIdToken, onAuthStateChanged, User } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 
 import Loading from '@/doodle/components/Loading';
@@ -7,34 +7,68 @@ import { useFirebase } from '@/doodle/contexts/Firebase';
 import { UserContext } from '@/doodle/contexts/User';
 import { IUser } from '@/doodle/types/User';
 
+import { setCookie, removeCookies } from 'cookies-next';
+import doodleConfig from '@/doodle/config';
+import { useRouter } from 'next/router';
+
 interface IUserProviderProps {
   children: React.ReactNode;
 }
 
 const UserProvider = ({ children }: IUserProviderProps) => {
-  const { auth, firestore } = useFirebase();
-
   const [waitingForFirebase, setWaitingForFirebase] = useState(true);
   const [user, setUser] = useState<IUser>(null);
 
-  // TODO: Find out why this isn't firing when a user authenticates.
-  const authStateChanged = async (user: User) => {
+  const { auth, firestore } = useFirebase();
+  const router = useRouter();
+
+  const authObserver = async (user: User) => {
     if (!user) {
       setUser(null);
       setWaitingForFirebase(false);
 
+      removeCookies('DIT');
+
       return;
     }
 
+    const { uid } = user;
+
     const docRef = doc(firestore, `users/${user.uid}`);
     const docSnapshot = await getDoc(docRef);
-    const userData = docSnapshot.data() as IUser;
+
+    const userData = (docSnapshot.data() ?? {
+      uid,
+    }) as IUser;
+
+    if (!docSnapshot.exists) {
+      await setDoc(docRef, userData);
+    }
+
+    const token = await getIdToken(user);
+
+    const { redirects, token: tokenConfiguration } =
+      doodleConfig.middleware.authentication;
+    const { expiry } = tokenConfiguration;
+    const { destination, from } = redirects;
+
+    setCookie('DIT', token, {
+      maxAge: expiry,
+    });
 
     setUser(userData);
     setWaitingForFirebase(false);
+
+    if (from.includes(router.asPath)) {
+      router.push(destination);
+    }
   };
 
-  useEffect(() => onAuthStateChanged(auth, authStateChanged), []);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, authObserver);
+
+    return () => unsubscribe();
+  }, []);
 
   if (waitingForFirebase) {
     return (

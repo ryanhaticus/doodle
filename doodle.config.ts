@@ -31,7 +31,14 @@ const doodleConfig = {
   middleware: {
     authentication: {
       secured: ['/app'],
-      fallback: '/auth/sign-in',
+      redirects: {
+        fallback: '/auth/sign-in',
+        destination: '/app',
+        from: ['/auth/sign-in', '/auth/sign-up'],
+      },
+      token: {
+        expiry: 60 * 60 * 24, // 1 day
+      },
     },
   },
 };

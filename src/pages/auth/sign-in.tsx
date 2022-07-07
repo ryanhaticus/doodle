@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { FormEvent, useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useRouter } from 'next/router';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 import Logo from '@/doodle/components/Logo';
 import PageSeo from '@/doodle/components/PageSeo';
@@ -12,7 +11,6 @@ const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const router = useRouter();
   const { auth } = useFirebase();
   const { display } = useToast();
 
@@ -22,7 +20,11 @@ const SignIn = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
 
-      router.push('/app');
+      display('Signed in', 'Please wait while we redirect you.', {
+        type: 'success',
+        cancelText: 'Continue',
+        closeOnRedirect: true,
+      });
     } catch (e) {
       switch (e.code) {
         case 'auth/user-not-found':
@@ -127,7 +129,7 @@ const SignIn = () => {
               </div>
 
               <div className='text-sm'>
-                <Link href='/auth/forgot-password'>
+                <Link href='/auth/reset-password'>
                   <a className='font-medium text-indigo-600 hover:text-indigo-500'>
                     Forgot your password?
                   </a>

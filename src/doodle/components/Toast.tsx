@@ -10,6 +10,7 @@ import {
 
 import { ToastType } from '@/doodle/types/ToastType';
 import { classNames } from '../helpers/tailwindcss';
+import { useRouter } from 'next/router';
 
 interface IToastProps {
   open: boolean;
@@ -18,6 +19,7 @@ interface IToastProps {
   message: string;
   type?: ToastType;
   cancelText?: string;
+  closeOnRedirect?: boolean;
 }
 
 const Toast = ({
@@ -27,7 +29,18 @@ const Toast = ({
   message,
   type,
   cancelText,
+  closeOnRedirect,
 }: IToastProps) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!closeOnRedirect) {
+      return;
+    }
+
+    setOpen(false);
+  }, [router.asPath]);
+
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as='div' className='relative z-40' onClose={setOpen}>
