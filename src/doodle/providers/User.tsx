@@ -59,7 +59,8 @@ const UserProvider = ({ children }: IUserProviderProps) => {
     setUser(userData);
     setWaitingForFirebase(false);
 
-    if (from.includes(router.asPath)) {
+    // cannot use router.asPath as it isn't updated when routes are rewritten by Next
+    if (from.includes(window.location.pathname)) {
       router.push(destination);
     }
   };
