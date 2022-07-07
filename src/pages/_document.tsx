@@ -1,11 +1,11 @@
+import doodleConfig from '@/doodle/config';
 import { Head, Html, Main, NextScript } from 'next/document';
 
 const Document = () => {
+  const { language } = doodleConfig.next.document;
+
   return (
-    <Html
-      className='h-full scroll-smooth antialiased'
-      lang={process.env.NEXT_PUBLIC_DOCUMENT_LANG}
-    >
+    <Html className='h-full scroll-smooth antialiased' lang={language}>
       <Head>
         <link rel='preconnect' href='https://fonts.googleapis.com' />
         <link

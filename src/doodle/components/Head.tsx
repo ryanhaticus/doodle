@@ -1,13 +1,13 @@
 import NextHead from 'next/head';
 
+import doodleConfig from '@/doodle/config';
+
 const Head = () => {
+  const { path, type } = doodleConfig.components.head.favicon;
+
   return (
     <NextHead>
-      <link
-        rel='icon'
-        href={process.env.NEXT_PUBLIC_DOODLE_HEAD_FAVICON_PATH}
-        type={process.env.NEXT_PUBLIC_DOODLE_HEAD_FAVICON_TYPE}
-      />
+      <link rel='icon' href={path} type={type} />
     </NextHead>
   );
 };

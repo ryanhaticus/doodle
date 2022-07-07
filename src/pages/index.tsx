@@ -3,6 +3,7 @@ import Logo from '@/doodle/components/Logo';
 const Index = () => {
   return (
     <>
+      {/* Put your own content within the <> </> brackets and start enjoy Doodle! */}
       <div className='flex items-center justify-center bg-indigo-800 min-h-screen'>
         <div>
           <div className='flex items-center gap-x-4 text-white text-7xl'>

@@ -1,12 +1,18 @@
 import { DefaultSeo } from 'next-seo';
 
+import doodleConfig from '@/doodle/config';
+
 const Seo = () => {
+  const { titleTemplate, default: defaults } = doodleConfig.components.seo;
+
+  const { title, description } = defaults;
+
   return (
     <>
       <DefaultSeo
-        titleTemplate={process.env.NEXT_PUBLIC_DOODLE_SEO_TITLE_TEMPLATE}
-        title={process.env.NEXT_PUBLIC_DOODLE_SEO_DEFAULT_TITLE}
-        description={process.env.NEXT_PUBLIC_DOODLE_SEO_DEFAULT_DESCRIPTION}
+        titleTemplate={titleTemplate}
+        title={title}
+        description={description}
       />
     </>
   );

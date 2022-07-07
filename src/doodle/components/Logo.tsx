@@ -1,25 +1,24 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
+import doodleConfig from '@/doodle/config';
 interface ILogoProps {
   href?: string;
   className?: string;
 }
 
 const Logo = ({ href, className }: ILogoProps) => {
+  const { srText, altText, path, width, height } = doodleConfig.components.logo;
+
   return (
-    <a href={href ?? '/'}>
-      <span className='sr-only'>
-        {process.env.NEXT_PUBLIC_DOODLE_LOGO_SITE_TITLE}
-      </span>
-      <div className={className}>
-        <Image
-          src={process.env.NEXT_PUBLIC_DOODLE_LOGO_PATH}
-          alt={process.env.NEXT_PUBLIC_DOODLE_LOGO_ALT_TEXT}
-          width={process.env.NEXT_PUBLIC_DOODLE_LOGO_WIDTH}
-          height={process.env.NEXT_PUBLIC_DOODLE_LOGO_HEIGHT}
-        />
-      </div>
-    </a>
+    <Link href={href ?? '/'}>
+      <a>
+        <span className='sr-only'>{srText}</span>
+        <div className={className}>
+          <Image src={path} alt={altText} width={width} height={height} />
+        </div>
+      </a>
+    </Link>
   );
 };
 

@@ -22,6 +22,7 @@
     "paths": {
       "@/styles/*": ["src/styles/*"],
       "@/doodle/*": ["src/doodle/*"],
+      "@/doodle/config": ["doodle.config.ts"]
     }
   },
   "include": [
