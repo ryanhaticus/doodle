@@ -5,7 +5,8 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import Logo from '@/doodle/components/Logo';
 import PageSeo from '@/doodle/components/PageSeo';
 import { useFirebase } from '@/doodle/contexts/Firebase';
-import { useToast } from '@/doodle/contexts/Toast';
+import { useInject } from '@/doodle/contexts/Inject';
+import Toast from '@/doodle/components/Toast';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +14,7 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const { auth } = useFirebase();
-  const { display } = useToast();
+  const { inject } = useInject();
 
   const onSignUp = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,43 +28,62 @@ const SignUp = () => {
 
       await createUserWithEmailAndPassword(auth, email, password);
 
-      display('Signed up', 'Please wait while we redirect you.', {
-        type: 'success',
-        cancelText: 'Continue',
-        closeOnRedirect: true,
-      });
+      inject(
+        <Toast
+          title='Signed up'
+          message='Please wait while we redirect you.'
+          type='success'
+          closeOnRedirect={true}
+        />,
+      );
     } catch (e) {
       switch (e.code) {
         case 'auth/password-mismatch':
-          display('Password mismatch', 'Please ensure your passwords match.', {
-            type: 'error',
-            cancelText: 'Try again',
-          });
+          inject(
+            <Toast
+              title='Password mismatch'
+              message='Please ensure your passwords match.'
+              type='error'
+              cancelText='Try again'
+              closeOnRedirect={true}
+            />,
+          );
           break;
 
         case 'auth/email-already-in-use':
-          display('Email already in use', 'You may already have an account.', {
-            type: 'error',
-            cancelText: 'Try again',
-          });
+          inject(
+            <Toast
+              title='Email aready in use.'
+              message='You may already have an account.'
+              type='error'
+              cancelText='Try again'
+              closeOnRedirect={true}
+            />,
+          );
           break;
 
         case 'auth/weak-password':
-          display(
-            'Weak password',
-            'Please ensure your password is at least 6 characters long.',
-            {
-              type: 'error',
-              cancelText: 'Try again',
-            },
+          inject(
+            <Toast
+              title='Weak password'
+              message='Please ensure your password is at least 6 characters long.'
+              type='error'
+              cancelText='Try again'
+              closeOnRedirect={true}
+            />,
           );
           break;
 
         default:
-          display('Unknown error', e.message, {
-            type: 'error',
-            cancelText: 'Try again',
-          });
+          inject(
+            <Toast
+              title='Unknown error'
+              message={e.message}
+              type='error'
+              cancelText='Try again'
+              closeOnRedirect={true}
+            />,
+          );
           break;
       }
     }

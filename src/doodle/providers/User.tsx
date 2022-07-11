@@ -1,18 +1,18 @@
 import { getIdToken, onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 import Loading from '@/doodle/components/Loading';
 import { useFirebase } from '@/doodle/contexts/Firebase';
 import { UserContext } from '@/doodle/contexts/User';
 import { IUser } from '@/doodle/types/User';
 
-import { setCookie, removeCookies } from 'cookies-next';
+import { setCookie, deleteCookie } from 'cookies-next';
 import doodleConfig from '@/doodle/config';
 import { useRouter } from 'next/router';
 
 interface IUserProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const UserProvider = ({ children }: IUserProviderProps) => {
@@ -27,7 +27,7 @@ const UserProvider = ({ children }: IUserProviderProps) => {
       setUser(null);
       setWaitingForFirebase(false);
 
-      removeCookies('DIT');
+      deleteCookie('DIT');
 
       return;
     }

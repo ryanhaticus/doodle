@@ -5,13 +5,14 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import Logo from '@/doodle/components/Logo';
 import PageSeo from '@/doodle/components/PageSeo';
 import { useFirebase } from '@/doodle/contexts/Firebase';
-import { useToast } from '@/doodle/contexts/Toast';
+import { useInject } from '@/doodle/contexts/Inject';
+import Toast from '@/doodle/components/Toast';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
 
   const { auth } = useFirebase();
-  const { display } = useToast();
+  const { inject } = useInject();
 
   const onPasswordReset = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,33 +20,39 @@ const ForgotPassword = () => {
     try {
       await sendPasswordResetEmail(auth, email);
 
-      display(
-        'Password reset sent',
-        'Please check your email address for a link to reset your password.',
-        {
-          type: 'success',
-          cancelText: 'Continue',
-          closeOnRedirect: true,
-        },
+      inject(
+        <Toast
+          title='Password reset sent'
+          message='Please check your email address for a link to reset your password.'
+          type='error'
+          cancelText='Try again'
+          closeOnRedirect={true}
+        />,
       );
     } catch (e) {
       switch (e.code) {
         case 'auth/user-not-found':
-          display(
-            'User not found',
-            'Please ensure your email address is correct.',
-            {
-              type: 'error',
-              cancelText: 'Try again',
-            },
+          inject(
+            <Toast
+              title='User not found'
+              message='Please ensure your email address is correct.'
+              type='error'
+              cancelText='Try again'
+              closeOnRedirect={true}
+            />,
           );
           break;
 
         default:
-          display('Unknown error', e.message, {
-            type: 'error',
-            cancelText: 'Try again',
-          });
+          inject(
+            <Toast
+              title='Unknown erorr'
+              message={e.message}
+              type='error'
+              cancelText='Try again'
+              closeOnRedirect={true}
+            />,
+          );
           break;
       }
     }

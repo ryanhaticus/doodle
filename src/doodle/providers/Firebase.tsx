@@ -1,13 +1,13 @@
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { Auth, getAuth } from 'firebase/auth';
 import { Firestore, getFirestore } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 import { FirebaseContext } from '@/doodle/contexts/Firebase';
 import Loading from '@/doodle/components/Loading';
 
 interface IFirebaseProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const FirebaseProvider = ({ children }: IFirebaseProviderProps) => {

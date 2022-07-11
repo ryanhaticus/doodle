@@ -5,14 +5,15 @@ import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import Logo from '@/doodle/components/Logo';
 import PageSeo from '@/doodle/components/PageSeo';
 import { useFirebase } from '@/doodle/contexts/Firebase';
-import { useToast } from '@/doodle/contexts/Toast';
+import { useInject } from '@/doodle/contexts/Inject';
+import Toast from '@/doodle/components/Toast';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const { auth } = useFirebase();
-  const { display } = useToast();
+  const { inject } = useInject();
 
   const onSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,32 +21,50 @@ const SignIn = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
 
-      display('Signed in', 'Please wait while we redirect you.', {
-        type: 'success',
-        cancelText: 'Continue',
-        closeOnRedirect: true,
-      });
+      inject(
+        <Toast
+          title='Signed in'
+          message='Please wait while we redirect you.'
+          type='success'
+          closeOnRedirect={true}
+        />,
+      );
     } catch (e) {
       switch (e.code) {
         case 'auth/user-not-found':
-          display('User not found', 'Please ensure your email is correct.', {
-            type: 'error',
-            cancelText: 'Try again',
-          });
+          inject(
+            <Toast
+              title='User not found'
+              message='Please ensure your email address is correct.'
+              type='error'
+              cancelText='Try again'
+              closeOnRedirect={true}
+            />,
+          );
           break;
 
         case 'auth/wrong-password':
-          display('Wrong password', 'Please ensure your password is correct.', {
-            type: 'error',
-            cancelText: 'Try again',
-          });
+          inject(
+            <Toast
+              title='Wrong password'
+              message='Please ensure your password is correct.'
+              type='error'
+              cancelText='Try again'
+              closeOnRedirect={true}
+            />,
+          );
           break;
 
         default:
-          display('Unknown error', e.message, {
-            type: 'error',
-            cancelText: 'Try again',
-          });
+          inject(
+            <Toast
+              title='Unknown error'
+              message={e.message}
+              type='error'
+              cancelText='Try again'
+              closeOnRedirect={true}
+            />,
+          );
           break;
       }
     }

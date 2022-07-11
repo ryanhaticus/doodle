@@ -1,5 +1,6 @@
-import Logo from '@/doodle/components/Logo';
 import Link from 'next/link';
+
+import Logo from '@/doodle/components/Logo';
 
 const Index = () => {
   return (

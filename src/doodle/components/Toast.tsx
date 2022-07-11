@@ -1,40 +1,49 @@
 import { Dialog, Transition } from '@headlessui/react';
-import {
-  useEffect,
-  useState,
-  Fragment,
-  useRef,
-  Dispatch,
-  SetStateAction,
-} from 'react';
+import { useEffect, Fragment, useState } from 'react';
 
 import { ToastType } from '@/doodle/types/ToastType';
 import { classNames } from '../helpers/tailwindcss';
 import { useRouter } from 'next/router';
 
 interface IToastProps {
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
   title: string;
   message: string;
   type?: ToastType;
   cancelText?: string;
   closeOnRedirect?: boolean;
+  onClose?: () => void;
 }
 
 const Toast = ({
-  open,
-  setOpen,
   title,
   message,
-  type,
-  cancelText,
-  closeOnRedirect,
+  type = 'info',
+  cancelText = 'Continue',
+  closeOnRedirect = false,
+  onClose,
 }: IToastProps) => {
+  const [open, setOpen] = useState(false);
+  const [initialPath, setInitialPath] = useState(null);
+
   const router = useRouter();
 
   useEffect(() => {
+    setOpen(true);
+
+    if (open || !onClose) {
+      return;
+    }
+
+    onClose();
+  }, [close]);
+
+  useEffect(() => {
     if (!closeOnRedirect) {
+      return;
+    }
+
+    if (!initialPath || router.asPath === initialPath) {
+      setInitialPath(router.asPath);
       return;
     }
 
