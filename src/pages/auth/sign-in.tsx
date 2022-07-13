@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { FormEvent, useState } from 'react';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useInject } from 'react-node-inject';
 
 import Logo from '@/doodle/components/Logo';
 import PageSeo from '@/doodle/components/PageSeo';
 import { useFirebase } from '@/doodle/contexts/Firebase';
-import { useInject } from '@/doodle/contexts/Inject';
 import Toast from '@/doodle/components/Toast';
 
 const SignIn = () => {
