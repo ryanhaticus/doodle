@@ -1,6 +1,6 @@
-import { initializeApp, cert } from 'firebase-admin/app';
+import { initializeApp, cert, getApp } from 'firebase-admin/app';
 
-export const useFirebaseAdmin = () => {
+export const useFirebaseAdmin = async () => {
   const app = initializeApp(
     {
       credential: cert({
@@ -9,7 +9,7 @@ export const useFirebaseAdmin = () => {
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       }),
     },
-    'doodle',
+    `doodle-${Date.now()}`,
   );
 
   return app;

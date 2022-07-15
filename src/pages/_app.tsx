@@ -1,3 +1,5 @@
+import stripe from 'stripe';
+
 import '@/styles/tailwindcss/directives.css';
 
 import Seo from '@/doodle/components/Seo';

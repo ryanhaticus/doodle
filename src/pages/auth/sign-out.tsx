@@ -10,11 +10,11 @@ const SignOut = () => {
   const { auth } = useFirebase();
 
   useEffect(() => {
-    const { fallback } = doodleConfig.middleware.authentication.redirects;
+    const { fallbackUrl } = doodleConfig.middleware.authentication.redirects;
     (async () => {
       await signOut(auth);
 
-      router.push(fallback);
+      router.push(fallbackUrl);
     })();
   }, []);
 

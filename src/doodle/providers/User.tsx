@@ -37,31 +37,36 @@ const UserProvider = ({ children }: IUserProviderProps) => {
     const docRef = doc(firestore, `users/${user.uid}`);
     const docSnapshot = await getDoc(docRef);
 
-    const userData = (docSnapshot.data() ?? {
-      uid,
-    }) as IUser;
-
-    if (!docSnapshot.exists) {
-      await setDoc(docRef, userData);
-    }
-
     const token = await getIdToken(user);
 
     const { redirects, token: tokenConfiguration } =
       doodleConfig.middleware.authentication;
     const { expiry } = tokenConfiguration;
-    const { destination, from } = redirects;
+    const { destinationUrl, fromUrls } = redirects;
 
     setCookie('DIT', token, {
       maxAge: expiry,
     });
 
+    await fetch('/api/stripe/subscription/update', {
+      method: 'POST',
+    });
+
+    const userData = (docSnapshot.data() ?? {
+      uid,
+      subscriptions: [],
+    }) as IUser;
+
+    if (!docSnapshot.exists()) {
+      await setDoc(docRef, userData);
+    }
+
     setUser(userData);
     setWaitingForFirebase(false);
 
     // cannot use router.asPath as it isn't updated when routes are rewritten by Next
-    if (from.includes(window.location.pathname)) {
-      router.push(destination);
+    if (fromUrls.includes(window.location.pathname)) {
+      router.push(destinationUrl);
     }
   };
 

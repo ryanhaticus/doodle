@@ -1,3 +1,5 @@
+import { classNames } from '../helpers/tailwindcss';
+
 interface ILoadingProps {
   className?: string;
 }
@@ -6,7 +8,7 @@ const Loading = ({ className }: ILoadingProps) => {
   return (
     <div className={className}>
       <svg
-        className='w-10 h-10 animate-spin fill-current'
+        className='animate-spin fill-current h-8 w-8'
         xmlns='http://www.w3.org/2000/svg'
         viewBox='0 0 512 512'
       >

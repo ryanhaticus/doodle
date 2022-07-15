@@ -30,16 +30,21 @@ const doodleConfig = {
   },
   middleware: {
     authentication: {
-      secured: ['/app'],
+      securedUrls: ['/app'],
       redirects: {
-        fallback: '/auth/sign-in',
-        destination: '/app',
-        from: ['/auth/sign-in', '/auth/sign-up'],
+        fallbackUrl: '/auth/sign-in',
+        destinationUrl: '/app',
+        fromUrls: ['/auth/sign-in', '/auth/sign-up'],
       },
       token: {
         expiry: 60 * 60 * 24, // 1 day
       },
     },
+  },
+  stripe: {
+    successUrl: '/app/subscription/success',
+    cancelUrl: '/app/subscription/cancel',
+    subscriptionUrl: '/app/subscription',
   },
 };
 
