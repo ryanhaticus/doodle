@@ -1,5 +1,5 @@
 import { getIdToken, onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { ReactNode, useEffect, useState } from 'react';
 
 import Loading from '@/doodle/components/Loading';
@@ -9,6 +9,8 @@ import { IUser } from '@/doodle/types/User';
 
 import { setCookie, deleteCookie } from 'cookies-next';
 import doodleConfig from '@/doodle/config';
+import { useStripe } from '@/doodle/contexts/Stripe';
+
 import { useRouter } from 'next/router';
 
 interface IUserProviderProps {
@@ -19,6 +21,7 @@ const UserProvider = ({ children }: IUserProviderProps) => {
   const [waitingForFirebase, setWaitingForFirebase] = useState(true);
   const [user, setUser] = useState<IUser>(null);
 
+  const { updateSubscriptions } = useStripe();
   const { auth, firestore } = useFirebase();
   const router = useRouter();
 
@@ -34,9 +37,6 @@ const UserProvider = ({ children }: IUserProviderProps) => {
 
     const { uid } = user;
 
-    const docRef = doc(firestore, `users/${user.uid}`);
-    const docSnapshot = await getDoc(docRef);
-
     const token = await getIdToken(user);
 
     const { redirects, token: tokenConfiguration } =
@@ -48,8 +48,13 @@ const UserProvider = ({ children }: IUserProviderProps) => {
       maxAge: expiry,
     });
 
-    await fetch('/api/stripe/subscription/update', {
-      method: 'POST',
+    await updateSubscriptions();
+
+    const docRef = doc(firestore, `users/${user.uid}`);
+    const docSnapshot = await getDoc(docRef);
+
+    onSnapshot(docRef, (s) => {
+      setUser(s.data() as IUser);
     });
 
     const userData = (docSnapshot.data() ?? {

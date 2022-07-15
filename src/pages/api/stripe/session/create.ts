@@ -46,12 +46,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const stripe = useStripe();
 
-  const customer = await stripe.customers.create({
-    email: user.email,
-    metadata: {
-      uid: user.uid,
-    },
-  });
+  const customers = await stripe.customers.list();
+  const customer =
+    customers.data.find((c) => c.metadata.uid === user.id) ||
+    (await stripe.customers.create({
+      email: user.email,
+      metadata: {
+        uid: user.uid,
+      },
+    }));
 
   const { successUrl, cancelUrl } = doodleConfig.stripe;
 

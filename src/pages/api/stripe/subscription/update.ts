@@ -1,6 +1,7 @@
 import { useAuth } from '@/doodle/server/auth';
 import { useFirestore } from '@/doodle/server/firestore';
 import { useStripe } from '@/doodle/server/stripe';
+import { ISubscription } from '@/doodle/types/Subscription';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -49,27 +50,43 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const subscriptions = await stripe.subscriptions.list({
     customer: customer.id,
+    status: 'all',
   });
 
   const firestore = await useFirestore();
 
-  await firestore
-    .collection('users')
-    .doc(user.uid)
-    .update({
-      subscriptions: subscriptions.data.map((s) => {
-        const planId = s.items.data.length > 0 ? s.items.data[0].id : null;
+  const mappedSubscriptions = await Promise.all(
+    subscriptions.data.map(async (s) => {
+      const { id, status, current_period_end, created, current_period_start } =
+        s;
 
-        return {
-          id: s.id,
-          status: s.status,
-          created: s.created,
-          current_period_start: s.current_period_start,
-          current_period_end: s.current_period_end,
-          planId: planId ?? 'unknown',
-        };
-      }),
-    });
+      const item = s.items.data.length > 0 ? s.items.data[0] : null;
+
+      const { plan } = item;
+
+      const { product: productId } = plan;
+
+      const { name } = await stripe.products.retrieve(productId as string);
+
+      return {
+        id,
+        status,
+        created,
+        current_period_start,
+        current_period_end,
+        name,
+        cancelled: s.cancel_at_period_end,
+        plan: {
+          id: plan.id,
+          amount: plan.amount,
+        },
+      };
+    }),
+  );
+
+  await firestore.collection('users').doc(user.uid).update({
+    subscriptions: mappedSubscriptions,
+  });
 
   res.status(200).json({
     message: 'Subscriptions updated',

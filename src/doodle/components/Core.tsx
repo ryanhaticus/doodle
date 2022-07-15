@@ -11,11 +11,11 @@ interface ICoreProps {
 const Core = ({ children }: ICoreProps) => {
   return (
     <FirebaseProvider>
-      <UserProvider>
-        <StripeProvider>
-          <InjectProvider>{children}</InjectProvider>{' '}
-        </StripeProvider>
-      </UserProvider>
+      <StripeProvider>
+        <UserProvider>
+          <InjectProvider>{children}</InjectProvider>
+        </UserProvider>
+      </StripeProvider>
     </FirebaseProvider>
   );
 };

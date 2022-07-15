@@ -7,8 +7,8 @@ interface IStripeProviderProps {
 }
 
 const StripeProvider = ({ children }: IStripeProviderProps) => {
-  const createSession = async (priceApiId: string) => {
-    const startSession = await fetch('/api/stripe/session/create', {
+  const getPaymentSessionUrl = async (priceApiId: string) => {
+    const session = await fetch('/api/stripe/session/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -18,13 +18,30 @@ const StripeProvider = ({ children }: IStripeProviderProps) => {
       }),
     });
 
-    const { url } = await startSession.json();
+    const { url } = await session.json();
 
     return url;
   };
 
+  const updateSubscriptions = async () => {
+    await fetch('/api/stripe/subscription/update', {
+      method: 'POST',
+    });
+  };
+
+  const cancelSubscription = async (subscriptionId: string) => {
+    await fetch('/api/stripe/subscription/cancel', {
+      method: 'POST',
+      body: JSON.stringify({
+        subscriptionId,
+      }),
+    });
+  };
+
   return (
-    <StripeContext.Provider value={{ createSession }}>
+    <StripeContext.Provider
+      value={{ getPaymentSessionUrl, updateSubscriptions, cancelSubscription }}
+    >
       {children}
     </StripeContext.Provider>
   );

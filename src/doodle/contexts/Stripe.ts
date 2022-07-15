@@ -1,7 +1,9 @@
 import { createContext, useContext } from 'react';
 
 interface IStripeContext {
-  createSession: (priceApiId: string) => Promise<string>;
+  getPaymentSessionUrl: (priceApiId: string) => Promise<string>;
+  cancelSubscription: (subscriptionId: string) => Promise<void>;
+  updateSubscriptions: () => Promise<void>;
 }
 
 export const StripeContext = createContext<IStripeContext>(null);
